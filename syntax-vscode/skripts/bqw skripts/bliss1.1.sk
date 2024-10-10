@@ -4268,58 +4268,116 @@ on drop amethyst shard:
 every 5 ticks:
 	loop all players:
 		if {Tag..%loop-player%} < 1:
-			set {_speedLevels::*} to 1, 2, 3
-			loop {_speedLevels::*}:
-				set {_min} to {SpeedMin%loop-value%.%loop-player%}
-				set {_sec} to {SpeedSec%loop-value%.%loop-player%}
-				
-				if {_min} < 1:
-					if {_sec} > 0:
-						set {Speed%loop-value%.%loop-player%} to "%{_sec}%s"
-					else:
-						set {Speed%loop-value%.%loop-player%} to "&aReady!"
-				else if {_min} > 0:
-					if {_sec} < 1:
-						set {Speed%loop-value%.%loop-player%} to "%{_min}%m"
-					else:
-						set {Speed%loop-value%.%loop-player%} to "%{_min}%m %{_sec}%s"
-			set {_tiers::*} to "T1", "T2"
-			loop {_tiers::*}:
-				if loop-player's off hand item is {Bliss.Speed.%loop-value%.%loop-player%} or loop-player is holding {Bliss.Speed.%loop-value%.%loop-player%}:
-					blissSpeedAutoEnchant(loop-value parsed as number, loop-player)
-					blissSpeedActionBar(loop-value parsed as number, loop-player)
+			if {SpeedMin.%loop-player%} < 1:
+				if {SpeedSec.%loop-player%} > 0:
+					set {Speed1.%loop-player%} to "%{SpeedSec.%loop-player%}%s"
+				if {SpeedSec.%loop-player%} < 1:
+					set {Speed1.%loop-player%} to "&aReady!"
+			if {SpeedMin.%loop-player%} < 0:
+				set {Speed1.%loop-player%} to "&aReady!"
+			if {SpeedMin.%loop-player%} > 0:
+				if {SpeedSec.%loop-player%} < 1:
+					set {Speed1.%loop-player%} to "%{SpeedMin.%loop-player%}%m"
+				if {SpeedSec.%loop-player%} > 0:
+					set {Speed1.%loop-player%} to "%{SpeedMin.%loop-player%}%m %{SpeedSec.%loop-player%}%s"
+			if {SpeedMin2.%loop-player%} < 1:
+				if {SpeedSec2.%loop-player%} > 0:
+					set {Speed2.%loop-player%} to "%{SpeedSec2.%loop-player%}%s"
+				if {SpeedSec2.%loop-player%} < 1:
+					set {Speed2.%loop-player%} to "&aReady!"
+			if {SpeedMin2.%loop-player%} < 0:
+				set {Speed2.%loop-player%} to "&aReady!"
+			if {SpeedMin2.%loop-player%} > 0:
+				if {SpeedSec2.%loop-player%} < 1:
+					set {Speed2.%loop-player%} to "%{SpeedMin2.%loop-player%}%m"
+				if {SpeedSec2.%loop-player%} > 0:
+					set {Speed2.%loop-player%} to "%{SpeedMin2.%loop-player%}%m %{SpeedSec2.%loop-player%}%s"
+			if {SpeedMin3.%loop-player%} < 1:
+				if {SpeedSec3.%loop-player%} > 0:
+					set {Speed3.%loop-player%} to "%{SpeedSec3.%loop-player%}%s"
+				if {SpeedSec3.%loop-player%} < 1:
+					set {Speed3.%loop-player%} to "&aReady!"
+			if {SpeedMin3.%loop-player%} < 0:
+				set {Speed3.%loop-player%} to "&aReady!"
+			if {SpeedMin3.%loop-player%} > 0:
+				if {SpeedSec3.%loop-player%} < 1:
+					set {Speed3.%loop-player%} to "%{SpeedMin3.%loop-player%}%m"
+				if {SpeedSec3.%loop-player%} > 0:
+					set {Speed3.%loop-player%} to "%{SpeedMin3.%loop-player%}%m %{SpeedSec3.%loop-player%}%s"
+			if loop-player's off hand item is {Bliss.Speed.T1.%loop-player%}:
+				blissSpeedAutoEnchantT1(loop-player)
+				blissSpeedActionBarT1(loop-player)
+			if loop-player is holding {Bliss.Speed.T1.%loop-player%}:
+				blissSpeedAutoEnchantT1(loop-player)
+				blissSpeedActionBarT1(loop-player)
+			if loop-player's off hand item is {Bliss.Speed.T2.%loop-player%}:
+				blissSpeedAutoEnchantT2(loop-player)
+				blissSpeedActionBarT2(loop-player)
+			if loop-player is holding {Bliss.Speed.T2.%loop-player%}:
+				blissSpeedAutoEnchantT2(loop-player)
+				blissSpeedActionBarT2(loop-player)
 
 #Functions
-function blissSpeedAutoEnchant(tier:number, p: player):
+function blissSpeedAutoEnchantT2(p: player):
 	if {speed.cooldown.%{_p}%} is false:
-		send "&e🔮 &bAuto Enchanting Tier %{_tier}%" to {_p}
+		send "&e🔮 &bAuto Enchanting" to {_p}
 		set {SpeedMin.%{_p}%} to 10
 		set {SpeedSec.%{_p}%} to 0
 		set {speed.cooldown.%{_p}%} to true
 		loop all items in {_p}'s inventory:
 			loop-item is not enchanted with efficiency:
-				if loop-item is any tool:
-					enchant the loop-item with efficiency {_tier}
-		
-function blissSpeedActionBar(tier: number, p: player):
-	if {_tier} is 1:
-		apply speed 2 without particles whilst hiding the potion icon to {_p} for 2 seconds replacing the existing effect
-		send action bar "&e🔺 &b%{Speed1.%{_p}%}%" to {_p}
-	else if {_tier} is 2:
-		apply speed 3 without particles whilst hiding the potion icon to {_p} for 2 seconds replacing the existing effect
-		apply dolphins grace 1 without particles whilst hiding the potion icon to {_p} for 2 seconds replacing the existing effect
-		send action bar "&e🎯 &b%{Speed2.%{_p}%}%  &e🔮 &b%{Speed1.%{_p}%}%  &e🌩 &b%{Speed3.%{_p}%}%" to {_p}
-					
+				if loop-item is any pickaxe:
+					enchant the loop-item with efficiency 5
+				if loop-item is any axe:
+					enchant the loop-item with efficiency 5
+				if loop-item is any hoe:
+					enchant the loop-item with efficiency 5
+				if loop-item is any shovel:
+					enchant the loop-item with efficiency 5
+function blissSpeedAutoEnchantT1(p: player):
+	if {speed.cooldown.%{_p}%} is false:
+		send "&e🔺 &bAuto Enchanting" to {_p}
+		set {SpeedMin.%{_p}%} to 10
+		set {SpeedSec.%{_p}%} to 0
+		set {speed.cooldown.%{_p}%} to true
+		loop all items in {_p}'s inventory:
+			loop-item is not enchanted with efficiency:
+				if loop-item is any pickaxe:
+					enchant the loop-item with efficiency 2
+				if loop-item is any axe:
+					enchant the loop-item with efficiency 2
+				if loop-item is any hoe:
+					enchant the loop-item with efficiency 2
+				if loop-item is any shovel:
+					enchant the loop-item with efficiency 2
+function blissSpeedActionBarT2(p: player):
+	apply speed 3 without particles whilst hiding the potion icon to {_p} for 2 seconds replacing the existing effect
+	apply dolphins grace 1 without particles whilst hiding the potion icon to {_p} for 2 seconds replacing the existing effect
+	send action bar "&e🎯 &b%{Speed2.%{_p}%}%  &e🔮 &b%{Speed1.%{_p}%}%  &e🌩 &b%{Speed3.%{_p}%}%" to {_p}
+function blissSpeedActionBarT1(p: player):
+	send action bar "&e🔺 &b%{Speed1.%{_p}%}%" to {_p}
+	apply speed 2 without particles whilst hiding the potion icon to {_p} for 2 seconds replacing the existing effect
+
 every 1 second:
 	loop all players:
-		set {_speedLevels::*} to 1, 2, 3
-		loop {_speedLevels::*}:
-			remove 1 from {SpeedSec%loop-value%.%loop-player%}
-			if {SpeedSec%loop-value%.%loop-player%} is -1:
-				remove 1 from {SpeedMin%loop-value%.%loop-player%}
-				set {SpeedSec%loop-value%.%loop-player%} to 59
-				if {SpeedMin%loop-value%.%loop-player%} is -1:
-					set {speed.cooldown%loop-value%.%loop-player%} to false
+		remove 1 from {SpeedSec.%loop-player%}
+		remove 1 from {SpeedSec2.%loop-player%}
+		remove 1 from {SpeedSec3.%loop-player%}
+		if {SpeedSec.%loop-player%} is -1:
+			remove 1 from {SpeedMin.%loop-player%}
+			set {SpeedSec.%loop-player%} to 59
+			if {SpeedMin.%loop-player%} is -1:
+				set {speed.cooldown.%loop-player%} to false
+		if {SpeedSec2.%loop-player%} is -1:
+			remove 1 from {SpeedMin2.%loop-player%}
+			set {SpeedSec2.%loop-player%} to 59
+			if {SpeedMin2.%loop-player%} is -1:
+				set {speed.cooldown2.%loop-player%} to false
+		if {SpeedSec3.%loop-player%} is -1:
+			remove 1 from {SpeedMin3.%loop-player%}
+			set {SpeedSec3.%loop-player%} to 59
+			if {SpeedMin3.%loop-player%} is -1:
+				set {speed.cooldown3.%loop-player%} to false
 
 on damage:
 	if {Tag..%attacker%} < 1:
@@ -4338,10 +4396,12 @@ on damage:
 				set {speed.cooldown2.%attacker%} to true
 				loop 5 times:
 					loop 10 times:
-						set {_trail} to a line from {_victim} to location 1 meters above attacker
+						set {_attacker} to location 1 metres above attacker
+						set {_victim} to location 1 metres above victim
+						set {_trail} to a line from {_victim} to {_attacker}
 						set particle of {_trail} to dust particle using dustOption(rgb(244, 255, 28), 1.5) with force
 						draw shapes {_trail} at {_victim}
-						wait 0.2 seconds
+						wait 0.1 seconds
 on left click:
 	if {Tag..%player%} < 1:
 		if player's held item is {Bliss.Speed.T2.%player%}:
@@ -4491,7 +4551,7 @@ on damage:
 						apply speed 6 without particles whilst hiding the potion icon to victim for 4 seconds replacing the existing effect
 						set {Bliss.Speed.Attack.Trusted.Storm.%victim%} to 4
 on player walk:
-	if {Speed.storm.striked::%` of player%} > 0:
+	if {Speed.storm.striked::%uuid of player%} > 0:
 		teleport player to player
 every 1 second:
 	loop all players:
