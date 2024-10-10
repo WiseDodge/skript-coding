@@ -1,0 +1,86 @@
+command /discord:
+	trigger:
+		send "&2&lBlissDucks &8| &9&lDiscord&8: <link:https://discord.gg/DBHYkcMd3J>&9&l&nCLICK"
+		
+command /rules:
+	trigger:
+		send "&2&lRULES&8:"
+		send "&8[&21&8] &aUse common sense"
+		send "&8[&22&8] &aNo use of extreme profanity (Slurs)"
+		send "&8[&23&8] &aNo use of unfair modifications (Hacked Clients/etc)"
+		send "&8[&24&8] &aNo spamming/chat flood"
+		send "&8[&25&8] &aNo staff impersonation"
+		send "&8[&26&8] &aNo advertising"
+		send "&8[&27&8] &aNo encouraging self harm"
+		send "&8[&28&8] &aNo discussion of explicit content (Nudity/etc)"
+		send "&8[&29&8] &aNo doxxing"
+		send "&8[&210&8] &aNo sending malicious links"
+		send "&8[&211&8] &aNo exploiting bugs or glitches"
+		send "&8[&212&8] &aPushing people out of spawn using puffgem is strictly prohibited"
+		send "&8[&213&8] &aNo flooding the map"
+		send "&8[&214&8] &aNo glitching into blocks"
+		send "&8[&215&8] &aNo abusing speedstorm to get out of combat"
+		send "&8[&216&8] &aNo puff gem/form of dash into spawn"
+		send "&8[&217&8] &aNo abusing water in non-build zones"
+		send "&8[&218&8] &aUsing speed storm or cobweb to stay in KOTH is strictly prohibited"
+	
+on shoot:
+    if projectile is ender pearl:
+        wait 1 tick
+        set item cooldown of ender pearl for shooter to 14.95 seconds
+
+# secps version
+#on shoot:
+#	if projectile is ender pearl:
+#		if {cooldown::%player's uuid%} is not set:
+#			set {cooldown::%player's uuid%} to now
+#			stop
+#		set {_time} to difference between {cooldown::%player's uuid%} and now
+#		if {_time} is less than {@time} seconds:
+#			cancel event
+#			set {_cooldown} to {@time} seconds
+#			subtract {_time} from {_cooldown}
+#			send "{@message}" to player
+#		else:
+#			set {cooldown::%player's uuid%} to now
+
+command /mutechat:
+    permission: op
+    permission message: &c You don't have the required permission to perform that command.
+    trigger:
+        if {Globalchat} is not set:
+            set {Globalchat} to true
+            broadcast "&2&lBlissDucks &8| &aChat has been muted by &r&2%player%"
+            stop trigger
+
+        if {Globalchat} is set:
+            clear {Globalchat}
+            broadcast "&2&lBlissDucks &8| &aChat unmuted by &r&2%player%"
+
+on chat:
+    if {Globalchat} is true:
+        if player has permission "chat.mute.bypass":
+            stop trigger
+        else:
+            cancel event
+            send "&cChat is currently muted."
+
+on right click with paper:
+	if name of tool of player is "&6&lRevive Paper":
+		set {revive::%player's uuid%} to true
+		remove paper from player's inventory
+		send "&aUse /revive (&2username&a)&2!" to player
+
+command /revive <offline player>:
+	trigger:
+		if {revive::%player's uuid%} is set: 
+			console command "bliss:revive %arg-1%"
+			send "&aRevived &2%arg-1%"
+			delete {revive::%player's uuid%}
+
+on right click with paper:
+	if lore of tool of player is "&6Right click to redeem":
+		remove paper from player's inventory
+		send "&a&lYou have been upgraded to Member &d&l+&r!" to player
+		make console execute command "/lp user %player% parent add member+"			
+		

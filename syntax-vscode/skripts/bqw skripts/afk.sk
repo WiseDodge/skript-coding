@@ -1,0 +1,5 @@
+every 5 minutes:
+    loop all players:
+        if "%region at loop-player%" contains "afk":
+            play sound "entity.experience_orb.pickup" with volume 3 to all players
+            give sunflower named "&6&lAFK Token" to loop-player

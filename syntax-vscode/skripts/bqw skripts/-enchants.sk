@@ -1,0 +1,4 @@
+on mine:
+    if block is diamond_block, iron block, emerald block, gold block, deepslate iron ore, deepslate lapis lazuli ore, gold ore, emerald ore, diamond ore, stripped spruce wood, spruce planks, spruce stairs, stone or cobweb:
+        cancel drops
+        give drops of event-block using player's tool to player

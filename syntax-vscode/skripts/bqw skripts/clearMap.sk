@@ -1,0 +1,26 @@
+# Function to replace specific blocks with air
+function replaceBlocksWithAir(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number, blockTypes: texts):
+	loop {_blockTypes::*}:
+		# Replace the block with air within the specified coordinates
+		execute console command "/fill %{_x1}% %{_y1}% %{_z1}% %{_x2}% %{_y2}% %{_z2}% air replace %loop-value%"
+		wait 1 tick
+
+# Command to run the function with specified coordinates and block types
+command /clearmap <number> <number> <number> <number> <number> <number> <text>:
+	trigger:
+		# Permission check to allow only OPs to run the command
+		if player is op:
+			# Extract coordinates and block types from command arguments
+			set {_x1} to arg-1
+			set {_y1} to arg-2
+			set {_z1} to arg-3
+			set {_x2} to arg-4
+			set {_y2} to arg-5
+			set {_z2} to arg-6
+			set {_blockTypes::*} to arg-7 split at ","
+			
+			# Call the function to replace blocks
+			replaceBlocksWithAir({_x1}, {_y1}, {_z1}, {_x2}, {_y2}, {_z2}, {_blockTypes::*})
+			send "Specified blocks have been cleared." to player
+		else:
+			send "You do not have permission to use this command." to player

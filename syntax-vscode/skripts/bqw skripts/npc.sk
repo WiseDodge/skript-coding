@@ -1,0 +1,15 @@
+options:
+    d: &9Discord
+    s: &dStore
+    a: &aAFK WARP
+    m: &cMosh Pit
+
+on rightclick on entity:
+    if entity's display name is "&9Discord":
+        send "&2&lBliss&a&lDucks &8| &9&lDiscord&8: <link:https://discord.gg/DBHYkcMd3J>&9&l&nCLICK" to player
+    if entity's display name is "&dStore":
+        send "&2&lBliss&a&lDucks &8| &d&lStore&8: <link:https://duckcult-webstore.tebex.io/>&d&l&nCLICK" to player
+    if entity's display name is "&aAFK WARP":
+        teleport player to location(0, 89, 0, world)
+    if entity's display name is "&cMosh Pit":
+        teleport player to location(42, 94, -42, world)

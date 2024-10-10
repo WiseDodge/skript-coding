@@ -1,0 +1,33 @@
+on first join:
+	add 1 to {Joins}
+	set {joinnr.%player%} to {joins}
+	send "%player% is number %{joinnr.%player%}% to join this server!" to all players
+	set {_world} to player's world
+	set {_x} to x-coordinate of spawn point of {_world}
+	set {_y} to y-coordinate of spawn point of {_world}
+	set {_z} to z-coordinate of spawn point of {_world}
+
+	teleport player to {spawn}
+
+	# Execute the console command to set the player's spawn point to the world's global spawn point
+	execute console command "spawnpoint %player% %{_x}% %{_y}% %{_z}%"
+	send "Your spawn point has been set to the world's global spawn point (%{_x}%, %{_y}%, %{_z}%)." to player
+
+command /setspawn:
+    trigger:
+        # Get the world's global spawn point
+        set {_world} to player's world
+        set {_x} to x-coordinate of spawn point of {_world}
+        set {_y} to y-coordinate of spawn point of {_world}
+        set {_z} to z-coordinate of spawn point of {_world}
+
+        # Execute the console command to set the player's spawn point to the world's global spawn point
+        execute console command "spawnpoint %player% %{_x}% %{_y}% %{_z}%"
+        send "Your spawn point has been set to the world's global spawn point (%{_x}%, %{_y}%, %{_z}%)." to player
+	
+command /joinnumber [<offline player>]:
+	trigger:
+		if arg-1 is set:
+			send "%arg-1% joined as number: %{joinnr.%arg-1%}%" to player
+		else:
+			send "%player% joined as number : %{joinnr.%player%}%" to player

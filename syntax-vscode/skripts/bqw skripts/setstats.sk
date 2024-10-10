@@ -1,0 +1,27 @@
+command /setdeaths <player> <integer>:
+	permission: op
+	trigger:
+		set {deaths::%uuid of arg-1%} to arg-2
+		send "Set %arg-1%'s deaths to %arg-2%" to player
+		
+command /setkills <player> <integer>:
+	permission: op
+	trigger:
+		set {kills::%uuid of arg-1%} to arg-2
+		send "Set %arg-1%'s kills to %arg-2%" to player
+		
+command /viewkills <offline player>:
+	permission: viewkills.use
+	trigger:
+		send {kills::%uuid of arg-1%} to player
+		
+command /viewdeaths <offline player>:
+	permission: viewkills.use
+	trigger:
+		send {deaths::%uuid of arg-1%} to player
+		
+command /unfortunate <offline player>: 
+	permission: op 
+	trigger: 
+		set {unfortunate...%uuid of arg-1%} to false
+		send "done"

@@ -1,0 +1,24 @@
+on join:
+    while player is online:
+        set title of player's scoreboard to "&2&lBliss&a&lDucks"
+        set line 12 of player's scoreboard to "&7BlissDucks.minehut.gg"
+        set line 11 of player's scoreboard to "&f&m-----------------"
+        set line 10 of player's scoreboard to " &2Discord: &9&l/discord"
+        set line 9 of player's scoreboard to " &2Store: &d&l/buy"
+        set line 8 of player's scoreboard to "&f&m------------------"
+        set line 7 of player's scoreboard to " &2Ping: &f%player's ping%"
+        set line 6 of player's scoreboard to " &2Deaths: &f%{deaths::%player's uuid%}%"
+        set line 5 of player's scoreboard to " &2Kills: &f%{kills::%player's uuid%}%"
+        set line 4 of player's scoreboard to " &2User: &f%player%"
+        set line 3 of player's scoreboard to "&f&m------------------"
+        set line 2 of player's scoreboard to " &2Online &aPlayers: &f%amount of online players%"
+        set line 1 of player's scoreboard to "&f&m------------------"
+        wait 5 seconds
+        
+on first join:
+    set {kills::%uuid of player%} to 0
+    set {deaths::%uuid of player%} to 0
+
+on death of player:
+    add 1 to {kills::%uuid of attacker%}
+    add 1 to {deaths::%uuid of victim%}

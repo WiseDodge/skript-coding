@@ -1,0 +1,194 @@
+#SkriptHub uses cookies to make sure you get the best experience. Learn more
+#Got it!
+#Skript Hub
+#Scripts
+#Documentation
+#Tutorials
+#Support
+#Sign Up
+#Log In
+#What are lists?
+#Tutorial by: TheRealUnderscore
+
+#Many of you might have been told to use lists, and/or are wondering what lists are. Well, this is the tutorial for you!
+#Why should you use lists? Lists are a built-in form of variables that let you manage variables easily and efficiently.
+
+#Basic Understanding
+#A list is a TreeMap. A TreeMap stores values using keys.
+
+#What's a key?
+#A key is an index. It can be a player, a location, or anything. Although, no matter what, a key is a text. If you want a value that's not a text, parse it as the desired type.
+#Take such: {example::%player%}. %player% would be the key in this list.
+#Keep in mind that not all values that you send are the same when you use them in a key.
+
+For example, if a player is at coordinates 1, 2, 3 in the world world:
+    send "%location at player%" would output x: 1, y: 2, z: 3, but {example::%location at player%} would be {example::world:1,2,3}
+
+#How do I use them?
+#Lists are formatted just like variables, but with an important difference: ::. With lists, you use :: as a delimiter to tell Skript it's a list.
+
+#Usage
+#Well, how would you use lists in real code, you ask? It's simple!
+
+#Example
+on death:
+    add 1 to {kills::%attacker%}
+    add 1 to {deaths::%victim%}
+#This would simply store kills and deaths. Since it's a list, you can also loop and delete it.
+
+command /stats <text>:
+    trigger:
+        if arg-1 is "kills":
+            loop {kills::*}:
+                send "%loop-index% has %loop-value% kills!"
+        else if arg-1 is "deaths":
+            loop {deaths::*}:
+                send "%loop-index% has %loop-value% deaths. D:"
+        else if arg-1 is "delete":
+            # This would reset all kills and deaths
+            delete {kills::*}
+            delete {deaths::*}
+#(Check out this tutorial if you don't know how to make custom commands)
+
+#Looping is one of the key components of lists.
+#You may have noticed I used loop-index. If you don't know what that is, that's just the key of the value.
+#In this example, if Notch killed jeb_, {kills::notch} would be 1 (keys are lowercased), and {deaths::jeb_} would be 1 also.
+#If /stats kills was executed, it would send Notch has 1 kills!. Maybe not grammatically correct, but it gets the job done.
+
+#Convert old variables to lists
+#If you want to convert your old variables to lists, it's fairly simple.
+Some examples are as such:
+
+#{%player%.money} -> {money::%player's uuid%}
+#{home.warps.%player%} -> {warps::%player's uuid%::home}
+#{%player%.cooldown} -> {cooldown::%player's uuid%}
+#{kills.%attacker%} -> {kills::%attacker's uuid%}
+#You can see player is changed to player's uuid. This is just so if the player changes their name, the value won't be lost.
+
+#Adding a value
+#Now, there are times you also want to just add a value to a list. Well, although you can add, it's best you set them instead. This is much faster, and I'll explain why.
+
+on place:
+    set {placed::%event-location%} to player
+#This would "add" the block's location in relation to the player.
+
+on break:
+    if {placed::%event-location%} is event-player:
+        send "You placed this block earlier!"
+        delete {placed::%event-location%}
+#This would check if, on break, the block broken was placed by the player previously. If true, it sends a message to the player and removes the block's location from the list.
+
+#Why would you want to do this?
+The equivalent of this with just add would be:
+
+on place:
+    add event-location to {placed::%player%::*}
+on break:
+    if {placed::%player%::*} contains event-location:
+        send "You placed this block earlier!"
+        remove event-location from {placed::%player%::*}
+#Although this may seem simpler, it's a lot slower. Using add makes Skript loop through the whole list until it finds an empty value.
+
+In Skript code, this is basically:
+
+set {_key} to 1
+while {list::%{_key}%} is set:
+    add 1 to {_key}
+set {list::%{_key}%} to {_value}
+This means if you placed 20 blocks, Skript would've looped 190 times throughout the 20 blocks only.
+If you placed 50, a whole 1275!
+
+Using remove also loops the list, except differently.
+
+loop {list::*}:
+    if loop-value is {_value}:
+        delete {list::%loop-index%}
+        stop loop
+As you can see, internally this is way slower than simply using set and delete.
+Another alternative to adding is getting the size of the list, then setting it using that. i.e.
+
+set {_size} to (size of {list::*}) + 1
+set {list::%{_size}%} to {_value}
+Although, this can error. For example, if you have {list::1}, {list::2}, and {list::3}, and you delete {list::2}, the size of the list would be 2, and would replace {list::3} if you add to it.
+
+Sorting a list
+If you need to sort a list, it's simple, just use a sort function like this one:
+
+function sort(indices: strings, values: numbers, descending: boolean = true) :: strings:
+    loop {_indices::*}:
+        set {_sort::%{_values::%loop-index%}%.%loop-index%} to loop-value
+    return (reversed {_sort::*}) if {_descending} is true, else {_sort::*}
+Understanding of this function is not necessary due to it being relatively complex, but if you want to study it, you can. Because keys are lost using the sorted expression, a function is mandatory.
+
+Now imagine you have a list like such:
+{points::mark_} = 400
+{points::Jaeger_Danger} = 70
+{points::pesekjan} = 69
+{points::DelayedGaming} = 20
+{points::Skillsbo} = 15
+{points::some_dude} = 13
+
+And you have a command like such:
+
+command /sort:
+    trigger:
+        set {_sorted::*} to sort((indices of {points::*}), {points::*})
+        loop 5 times:
+            set {_player} to {_sorted::%loop-value%}
+            set {_value} to {points::%{_player}%}
+            send "%loop-value%. %{_player}% has %{_value}% points!" to sender
+Doing /sort would output:
+1. mark_ has 400 points!
+2. jaeger_danger has 70 points!
+3. pesekjan has 69 points!
+4. delayedgaming has 20 points!
+5. skillsbo has 15 points!
+As stated earlier, keys are lowercased, so all of these values are lowercased.
+If the keys of {points::*} are UUID strings or players, simply change set {_player} to {_sorted::%loop-value%} to set {_player} to {_sorted::%loop-value%} parsed as offline player.
+This way, {_player} would be the actual player type, allowing you to use it as such, and the casing is correct.
+
+Well, that's all. Please comment down below any suggestions you want me to add.
+
+Did you find TheRealUnderscore's tutorial helpful?
+
+You must be logged in to comment
+
+July 11, 2021, 9:14 p.m. - TheRealUnderscore  ¶
+If there's something you want to comment on, say it here!
+All feedback is greatly appreciated.
+
+ |    •  
+
+Oct. 11, 2021, 6:39 p.m. - Quik2007  ¶
+Thank you for the great tutorial!
+
+ |    •  
+
+Oct. 12, 2021, 5:48 p.m. - Quik2007  ¶
+Hi, i have a short question. How do i manage lists in other list?
+I have {regions::} and {regions::1::} (And {regions::1::owner} and so on). And how do i use "size of {regions::1::*}" or something?
+
+ |    •  
+
+Oct. 22, 2021, 3:26 p.m. - EnchantedApple  ¶
+Thank you very much. I've been trying to find this kind of tutorial for a long time!
+Very useful.
+
+ |    •  
+
+Oct. 27, 2023, 4:22 p.m. - DarkestVoids  ¶
+Err I know this has been up for a while but I have a quick question,
+
+How do I call the function to store the values?
+I'm trying to implement it into my code and I just can't get it to work, no errors the leaderboard just displays as "1. [HTML_REMOVED] has [HTML_REMOVED] points!"
+
+The variable I use to save the points for my game is {score::*} and to change players points I used {score::%uuid of player%} but I'm not sure how I would call the function using them.
+
+Any help would be greatly appreciated ty.
+
+ |    •  
+
+Oct. 27, 2023, 5:03 p.m. - DarkestVoids  ¶
+Nevermind I figured it out lol
+
+ |    •  

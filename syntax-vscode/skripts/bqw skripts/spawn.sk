@@ -1,0 +1,45 @@
+command /setspawnsk [<text>]:
+    permission: staff.setspawn
+    permission message: {@no_permission}
+    trigger:
+        set {spawn} to location of player
+        send "&aLocation for &2Spawn&a has been set to your current location." to player
+		
+command /spawn:
+    trigger:
+        set {_x} to player's x-coordinate
+        set {_y} to player's y-coordinate
+        set {_z} to player's z-coordinate
+        if player has permission "staff.instantspawn":
+            teleport player to {spawn}
+            send "&aTeleported to &2Spawn&a!" to player
+            send action bar "&aTeleported to &2Spawn&a!" to player
+        else:
+            send "&aTeleporting to &2Spawn &ain 5 seconds. &cDon't move!" to player
+            send action bar "&25&a seconds left" to player
+            set {_num} to 5
+            loop 5 times:
+                if player's x-coordinate = {_x}:
+                    if player's y-coordinate = {_y}:
+                        if player's z-coordinate = {_z}:
+                            wait 1 second
+                            remove 1 from {_num}
+                            if {_num} > 0:
+                                send action bar "&2%{_num}%&a seconds left" to player
+                            if {_num} = 0:
+                                teleport player to {spawn}
+                                send "&aTeleported to &2Spawn&a!" to player
+                                send action bar "&aTeleported to &2Spawn&a!" to player
+                                stop loop
+                        else:
+                            send "&cYou moved!" to player
+                            send action bar "&cYou moved!" to player
+                            stop loop
+                    else:
+                        send "&cYou moved!" to player
+                        send action bar "&cYou moved!" to player
+                        stop loop
+                else:
+                    send "&cYou moved!" to player
+                    send action bar "&cYou moved!" to player
+                    stop loop

@@ -1,0 +1,97 @@
+# Function to handle combat tagging
+function combatTag(p: player):
+	set {_u} to {_p}'s uuid
+	if {CT::%{_u}%} is set:
+		set {CT::%{_u}%} to 20
+	else:
+		set {CT::%{_u}%} to 20
+		while {CT::%{_u}%} is greater than 0:
+			if {CT::%{_u}%} = 1:
+				wait 1 second
+				subtract 1 from {CT::%{_u}%}
+				send action bar "&c %{CT::%{_u}%}% &csecond of combat left!" to {_p}
+			else:
+				wait 1 second
+				subtract 1 from {CT::%{_u}%}
+				send action bar "&c %{CT::%{_u}%}% &cseconds of combat left!" to {_p}
+		send "&aYou are no longer in combat! It is safe to log out!" to {_p}
+		delete {CT::%{_u}%}
+
+# Handle player quitting while in combat
+on quit:
+	if {CT::%player's uuid%} is set:
+		console command "kill %player%"
+		broadcast "&2%player% &acombat logged!"
+		delete {CT::%player's uuid%}
+
+# Handle player death
+on death:
+	attacker is a player
+	victim is a player
+	event-world contains "world"
+	set {CT::%victim's uuid%} to 0
+
+on death:
+    if victim is a player:
+        if damage cause is lightning:
+            set the death message to "%victim% was cooked!"
+
+# Handle damage events to start combat tagging
+on damage:
+	if "%region at victim%" contains "spawn":
+		apply potion effect of instant health 20 for 1 second to victim
+		apply potion effect of saturation 20 for 1 second to victim
+		cancel event
+	victim is a player
+	attacker is a player
+	event-world contains "world"
+	event is not cancelled
+	combatTag(victim)
+	combatTag(attacker)
+
+# Prevent teleporting into protected regions if in combat
+on region enter:
+	if player is not op:
+		if {CT::%player's uuid%} is set:
+			if "%event-region%" contains "spawn":
+				cancel event
+				wait 3 ticks
+				send "&cYou are in combat!"
+				if player's horizontal facing is west:
+					push player east at speed 0.5
+					push player upwards at speed 0.5
+				else if player's horizontal facing is east:
+					push player west at speed 0.5
+					push player upwards at speed 0.5
+				else if player's horizontal facing is south:
+					push player north at speed 0.5
+					push player upwards at speed 0.5
+				else if player's horizontal facing is north:
+					push player south at speed 0.5
+					push player upwards at speed 0.5
+				
+				clear all the potion effects of player
+				add potion effect of slow falling 1 to potion effects of player
+				add 1 to {spawnEntryCount::%player's uuid%}
+				if {spawnEntryCount::%player's uuid%} >= 10:
+					strike lightning at player
+					subtract 5 from {spawnEntryCount::%player's uuid%}
+				#add potion effect of instant damage 1 to potion effects of player
+
+				wait 40 ticks
+				clear all the potion effects of player
+
+				wait 140 ticks
+				subtract 1 from {spawnEntryCount::%player's uuid%}
+				if {spawnEntryCount::%player's uuid%} <= 0:
+					delete {spawnEntryCount::%player's uuid%}
+
+
+
+# Prevent commands from being executed if in combat
+on command:
+	if {CT::%player's uuid%} is set:
+		if player is not op:
+			if command is not "mute" or "kick" or "tempban" or "ban":
+				cancel event
+				send "&cYou are in combat!"

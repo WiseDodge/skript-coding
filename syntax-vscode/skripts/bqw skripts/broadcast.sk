@@ -1,0 +1,4 @@
+command /broadcast [<text>]:
+	permission: broadcast.use
+	trigger:
+		broadcast "&2&lBliss&a&lDucks &8| &7%colored arg%" 

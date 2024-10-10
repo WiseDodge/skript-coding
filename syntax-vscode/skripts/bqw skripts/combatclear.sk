@@ -1,0 +1,5 @@
+command /combatclear:
+	permission: op
+	trigger:
+		delete {CT::*}
+		send "Cleared combat tag.." to player

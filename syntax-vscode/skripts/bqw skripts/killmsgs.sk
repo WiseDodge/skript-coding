@@ -1,0 +1,14 @@
+on death of player:
+	# Variable Setter
+	set {_death.Victim} to victim
+	set {_death.Attacker} to attacker
+	set {_death.Attacker.Health} to health of attacker
+	# Randomizer
+	set {_death.Message.Randomizer} to a random integer between 1 and 3
+	if {_death.Message.Randomizer} is equal to 1:
+		set death message to "%nl%&c🗡 &r&c%{_death.Victim}% &r&7was slain by &r&2%{_death.Attacker}%&r&7! (&4%{_death.Attacker.Health}% ♥&r&7)%nl%"
+	else if {_death.Message.Randomizer} is equal to 2:
+		set death message to "%nl%&c🗡 &r&c%{_death.Victim}% &r&7was obliterated by &r&2%{_death.Attacker}%&r&7! (&4%{_death.Attacker.Health}% ♥&r&7)%nl%"		
+	else if {_death.Message.Randomizer} is equal to 3:
+		set death message to "%nl%&c🗡 &r&c%{_death.Victim}% &r&7was destroyed by &r&2%{_death.Attacker}%&r&7! (&4%{_death.Attacker.Health}% ♥&r&7)%nl%"
+		

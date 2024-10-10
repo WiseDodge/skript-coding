@@ -1,0 +1,37 @@
+on command "/bukkit:?":
+    if player doesn't have permission "op":
+        cancel event
+        send "&fUnknown command. Type ""/help"" for help." to player
+
+on command "/bukkit:help":
+    if player doesn't have permission "op":
+        cancel event
+        send "&fUnknown command. Type ""/help"" for help." to player
+
+on command "/bukkit:pl":
+    if player doesn't have permission "op":
+        cancel event
+        send "&fUnknown command. Type ""/help"" for help." to player
+
+on command "/bukkit:plugins":
+    if player doesn't have permission "op":
+        cancel event
+        send "&fUnknown command. Type ""/help"" for help." to player
+
+on command "/pl":
+    if player doesn't have permission "op":
+        cancel event
+        send "&fUnknown command. Type ""/help"" for help." to player
+
+on command "/?":
+    if player doesn't have permission "op":
+        cancel event
+        send "&fUnknown command. Type ""/help"" for help." to player
+
+on command "/plugins":
+    if player doesn't have permission "op":
+        cancel event
+        send "&fUnknown command. Type ""/help"" for help." to player
+
+on command "/minecraft:me":
+    cancel event

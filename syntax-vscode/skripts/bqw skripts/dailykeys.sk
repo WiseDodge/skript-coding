@@ -1,0 +1,53 @@
+command /void:
+	cooldown: 24 hours
+	cooldown message: &4You can use this key again in %remaining time%
+	permission: void.key
+	trigger:
+		console command "crate key give %player% black_candle 3" 
+		
+command /ethereal:
+	cooldown: 24 hours
+	cooldown message: &4You can use this key again in %remaining time%
+	permission: ethereal.key
+	trigger:
+		console command "crate key give %player% ethereal_key 3"
+		
+command /nebula:
+	cooldown: 24 hours
+	cooldown message: &4You can use this key again in %remaining time%
+	permission: nebula.key
+	trigger:
+		console command "crate key give %player% nebula_key 3"
+		
+command /oblivion:
+	cooldown: 24 hours
+	cooldown message: &4You can use this key again in %remaining time%
+	permission: oblivion.key
+	trigger:
+		console command "crate key give %player% oblivion_key 3"
+
+command /daily:
+	cooldown: 24 hours
+	cooldown message: &4You can use this key again in %remaining time%
+	trigger:
+		console command "crate key give %player% daily_key 3"
+
+		
+
+
+#NEW DAILY KEY FORMAT:
+#command /<key>:
+#	cooldown: 24 hours
+#	cooldown message: &4You can use this key again in %remaining time%
+#	permission: <key>.key
+#	trigger:
+#		console command "crate key give %player% <key> <amt>"
+		#send "&x&2&3&F&B&0&0Y&x&2&3&F&9&0&1o&x&2&3&F&7&0&2u &x&2&2&F&4&0&2h&x&2&2&F&2&0&3a&x&2&2&F&0&0&4v&x&2&2&E&E&0&5e &x&2&2&E&C&0&6c&x&2&2&E&9&0&7l&x&2&1&E&7&0&7a&x&2&1&E&5&0&8i&x&2&1&E&3&0&9m&x&2&1&E&1&0&Ae&x&2&1&D&E&0&Bd &x&2&1&D&C&0&Cy&x&2&0&D&A&0&Co&x&2&0&D&8&0&Du&x&2&0&D&6&0&Er !KEY! &x&2&0&D&3&0&F. &x&2&0&D&1&1&0C&x&2&0&C&F&1&1l&x&1&F&C&D&1&1a&x&1&F&C&B&1&2i&x&1&F&C&8&1&3m &x&1&F&C&6&1&4i&x&1&F&C&4&1&5t &x&1&E&C&2&1&5a&x&1&E&C&0&1&6g&x&1&E&B&D&1&7a&x&1&E&B&B&1&8i&x&1&E&B&9&1&9n &x&1&E&B&7&1&Ai&x&1&D&B&5&1&An &x&1&D&B&2&1&B2&x&1&D&B&0&1&C4 &x&1&D&A&E&1&Dh&x&1&D&A&C&1&Eo&x&1&D&A&A&1&Fu&x&1&C&A&7&1&Fr&x&1&C&A&5&2&0s&x&1&C&A&3&2&1!" to player		
+	
+#command /testcooldown:
+#	permission: op
+#	cooldown: 15 seconds
+#	cooldown message: "Cooldown %remaining time%"
+#	trigger:
+#		send "Yes" to player
+		

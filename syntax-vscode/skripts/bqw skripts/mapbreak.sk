@@ -1,0 +1,59 @@
+    # Moose configs (has whitelist and blacklist modes)
+
+    # Default mode
+on load:
+    if {blockmode} is not set:
+        set {blockmode} to "blacklist"
+        send "Its doggy doo doo woggy woo woo poopy scoopy time!" to console
+
+    # Define the lists of whitelisted blocks and blacklisted blocks
+    set {whitelisted.place.blocks::*} to cobweb, spruce_wood, spruce_planks, spruce_stairs, spruce_slab, spruce_pressure_plate, spruce_button, cobblestone, cobblestone_stairs, cobblestone_slab, or sponge
+    set {whitelisted.break.blocks::*} to cobweb, spruce_wood, spruce_planks, spruce_stairs, spruce_slab, spruce_pressure_plate, spruce_button, cobblestone, cobblestone_stairs, cobblestone_slab, or sponge
+
+    set {blacklisted.place.blocks::*} to minecart with chest, hopper, dispenser, dropper, blast furnace, furnace, smoker, shulker box, white shulker box, light gray shulker box, gray shulker box, black shulker box, brown shulker box, red shulker box, orange shulker box, yellow shulker box, lime shulker box, green shulker box, cyan shulker box, light blue shulker box, blue shulker box, purple shulker box, magenta shulker box, pink shulker box, chest, barrel, trapped chest, oak boat with chest, diamond block, emerald block, iron block, gold block, lapis lazuli block, stripped oak log, oak wood, oak slab, string, oak door, spruce trapdoor, spruce fence, spruce fence gate, cobblestone, stone, grass block, hopper, item frame or dirt
+    set {blacklisted.break.blocks::*} to dirt, sand, snow block, smooth basalt, deepslate, cobbled deepslate, andesite, light gray concrete, dead fire coral block, grass block, sandstone, light blue stained glass, dead brain coral block, orange terracotta, yellow terracotta, smooth stone, moss block, polished andesite, snow, coarse dirt, sandstone slab, smooth sandstone, blue stained glass, red wool, cherry leaves, brown terracotta, gravel, ice, packed mud, packed ice, blue ice, lime terracotta, jungle planks, white concrete, red concrete, stone bricks, stone brick stairs, jungle leaves, cyan terracotta, green terracotta, deepslate bricks, smooth stone slab, stone brick slab, polished blackstone, quartz bricks, white wool, quartz slab, cyan stained glass, black stained glass, blackstone, acacia planks, birch slab, gray concrete powder, grass, cherry log, red terracotta, stone button, polished andesite stairs, gray concrete, light gray wool, polished diorite, jungle wood, polished blackstone brick wall, polished blackstone slab, deepslate tile slab, melon, polished deepslate, quartz stairs, cobblestone stairs, deepslate tiles, pumpkin, gray wool, string, carved pumpkin, chain, andesite slab, andesite wall, oak stairs, green candle, oak slab, red concrete powder, oak leaves, white carpet, orange candle, oak fence, gray carpet, polished andesite slab, andesite stairs, iron trapdoor, soul lantern, furnace, granite, block of netherite, blue bed, light blue carpet, light blue wool, red carpet, white carpet, string, glass or soul campfire
+
+    # command
+command /antiblockmode <text>:
+    trigger:
+        if arg-1 is "blacklist":
+            set {blockmode} to "blacklist"
+            send "&aSwitched to blacklist mode"
+        else if arg-1 is "whitelist":
+            set {blockmode} to "whitelist"
+            send "&aSwitched to whitelist mode"
+        else:
+            send "Invalid mode. Either use 'blacklist' or 'whitelist'."
+
+    # Block place
+on block place:
+    if player is not op:
+        if "%region at event-block%" contains "box":
+            if {blockmode} is "whitelist": # checking mode
+                if block is not in {whitelisted.place.blocks::*}:
+                    send "&cWoah! You are not allowed to place that block here." to player
+                    cancel event
+            else:
+                if block is in {blacklisted.place.blocks::*}:
+                    send "&cWoah! You are not allowed to place that block here." to player
+                    cancel event
+
+    # Block break
+on block break:
+    if player is not op:
+        if "%region at event-block%" contains "box":
+            if {blockmode} is "whitelist": #checking mode
+                if block is not in {whitelisted.break.blocks::*}:
+                    send "&cWoah! You are not allowed to break that block here." to player
+                    cancel event
+            else: 
+                if block is in {blacklisted.break.blocks::*}:
+                    send "&cWoah! You are not allowed to break that block here." to player
+                    cancel event
+
+
+                    # ERRORS
+                        # Line 33:mapbreak.sk
+                            # Can't compare a block with 'in {whitelisted.place.blocks::*}:'
+                        # Line 46:mapbreak.sk
+                            # Can't compare a block with 'in {whitelisted.place.blocks::*}:'

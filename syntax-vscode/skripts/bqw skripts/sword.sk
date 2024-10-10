@@ -1,0 +1,19 @@
+on death:
+    victim is a player:
+        attacker is a player:
+            if attacker's tool is unbreakable netherite sword named "&4&lBlood Sword":
+                apply strength 3 to attacker for 8 seconds replacing the existing effect
+                apply health boost 2 to attacker for 30 seconds replacing the existing effect
+                apply regeneration 4 to attacker for 5 seconds replacing the existing effect
+                wait 6 seconds
+                apply regeneration 2 to attacker for 30 seconds replacing the existing effect
+            if attacker's tool is unbreakable netherite sword named "&9&lSoul Dagger":
+                apply invisibility 1 to attacker for 60 seconds replacing the existing effect
+                set {Soul.Speed.Attack.%attacker%} to 30
+                
+
+every 1 second:
+    loop all players:
+        remove 1 from {Soul.Speed.Attack.%loop-player%}
+        if {Soul.Speed.Attack.%loop-player%} > 0:
+            set loop-entity's attack speed attribute to 20
