@@ -5055,67 +5055,53 @@ every 5 ticks:
 				set {_strength.dot.group.8.%loop-player%} to location 0.7 metres above and 0 metres infront and -1.5 metres left loop-player
 				draw 3 dust using dustOption(rgb(199, 0, 10), 1) at {_strength.dot.group.8.%loop-player%} with extra 0 with force
 
+# bloodthorns revision
 on damage:
-	if attacker's off hand item is {Bliss.Strength.T2.%attacker%}:
-		if attacker's health < 4:
-			add 6 to damage
-		if attacker's health is 4.5:
-			add 5.5 to damage
-		if attacker's health is 5:
-			add 4.5 to damage
-		if attacker's health is 5.5:
-			add 4 to damage
-		if attacker's health is 6:
-			add 3.5 to damage
-		if attacker's health is 6.5:
-			add 2.5 to damage
-		if attacker's health is 7:
-			add 2 to damage
-		if attacker's health is 7.5:
-			add 1.5 to damage
-		if attacker's health is 8:
-			add 1 to damage
-		if attacker's health is 8.5:
-			add 0.5 to damage
-	if attacker's off hand item is {Bliss.Strength.T1.%attacker%}:
-		if attacker's health < 3:
-			add 6 to damage
-		if attacker's health is 3.5:
-			add 5.5 to damage
-		if attacker's health is 4:
-			add 4.5 to damage
-		if attacker's health is 4.5:
-			add 4 to damage
-		if attacker's health is 5:
-			add 3.5 to damage
-		if attacker's health is 5.5:
-			add 2.5 to damage
-		if attacker's health is 6:
-			add 2 to damage
-		if attacker's health is 6.5:
-			add 1.5 to damage
-		if attacker's health is 7:
-			add 1 to damage
-		if attacker's health is 7.5:
-			add 0.5 to damage
+	if attacker's off hand item is {Bliss.Strength.T1.%attacker%} or attacker's off hand item is {Bliss.Strength.T2.%attacker%}:
+		set {bt_missingHearts} to (max health of attacker - health of attacker) / 2  # calcs missing hearts
+
+		# dmg cap based on strength tiers
+		if attacker has strength 2:
+			set {bt_baseDamageCap} to 75
+		else if attacker has strength 1:
+			set {bt_baseDamageCap} to 60
+		else:
+			set {bt_baseDamageCap} to 50
+
+		# logarithmic dmg scaling based on missing hearts and gem tier
+		if attacker's off hand item is {Bliss.Strength.T1.%attacker%}:
+			set {bt_damageIncrease} to log({bt_missingHearts} + 1) * 2.5
+		else if attacker's off hand item is {Bliss.Strength.T2.%attacker%}:
+			set {bt_damageIncrease} to log({bt_missingHearts} + 1) * 3.5
+
+		# non-negative dmg check
+		if {bt_damageIncrease} < 0:
+			set {bt_damageIncrease} to 0
+
+		# crit hit check
+		if hit is critical:
+			set {bt_damageIncrease} to {bt_damageIncrease} * 0.8 # crit dmg control
+
+			if {ChadStrength..%attacker%} is true:
+				if {Test.Double.%attacker%} is 3:
+					set {dmg} to damage
+					add {dmg} to damage
+					set {Test.Double.%attacker%} to -1
+					set {ChadStrength..%attacker%} to false
+				add 1 to {Test.Double.%attacker%}
+			if {ChadStrengthGroup..%attacker%} is true:
+				if {Test.DoubleGroup.%attacker%} is 8:
+					set {dmg} to damage
+					add {dmg} to damage
+					set {Test.DoubleGroup.%attacker%} to -1
+					set {ChadStrengthGroup..%attacker%} to false
+				add 1 to {Test.DoubleGroup.%attacker%}
+
+		# max dmg cap for total dmg
+		increase damage by {bt_damageIncrease} percent # final damage increase
+
 	if {dmg..%attacker%} > 11:
 		set {dmg..%attacker%} to 12
-	if hit is critical:
-		if {ChadStrength..%attacker%} is true:
-			if {Test.Double.%attacker%} is 3:
-				set {dmg} to damage
-				add {dmg} to damage
-				set {Test.Double.%attacker%} to -1
-				set {ChadStrength..%attacker%} to false
-			add 1 to {Test.Double.%attacker%}
-		if {ChadStrengthGroup..%attacker%} is true:
-			if {Test.DoubleGroup.%attacker%} is 8:
-				set {dmg} to damage
-				add {dmg} to damage
-				set {Test.DoubleGroup.%attacker%} to -1
-				set {ChadStrengthGroup..%attacker%} to false
-			add 1 to {Test.DoubleGroup.%attacker%}
-
 
 on drop prismarine shard:
 	if event-item is {Bliss.Strength.T2.%player%}:
