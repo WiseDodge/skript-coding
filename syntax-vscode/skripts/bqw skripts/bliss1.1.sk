@@ -3217,9 +3217,10 @@ on right click:
 
 every 1 second:
 	loop all players:
-		if loop-player is within 4 blocks around {Fire.Cozy.Location::*}:
-			apply saturation 1 without particles whilst hiding the potion icon to loop-player for 1 seconds replacing the existing effect
-			apply regeneration 1 without particles whilst hiding the potion icon to loop-player for 1 seconds replacing the existing effect
+		if loop-player is the player:
+			if loop-player is within 4 blocks around {Fire.Cozy.Location::*}:
+				apply saturation 1 without particles whilst hiding the potion icon to loop-player for 1 second replacing the existing effect
+				apply regeneration 1 without particles whilst hiding the potion icon to loop-player for 1 second replacing the existing effect
 
 
 on left click:
