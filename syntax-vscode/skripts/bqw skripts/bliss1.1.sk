@@ -3987,280 +3987,200 @@ on drop amethyst shard:
 		cancel event		
 
 
-#[<-----------------Puff----------------->]
+# [<-----------------Puff----------------->]
 
+# Cooldown function
+function setCooldown(seconds: number, cooldownVariable: string):
+    set {cooldownVariable} to true
+    set {_currentSeconds} to seconds
+    every 1 second:
+        if {cooldownVariable} is true:
+            remove 1 from {_currentSeconds}
+            if {_currentSeconds} <= 0:
+                set {cooldownVariable} to false
+                stop
 
+# puff cooldowns
 every 5 ticks:
 	loop all players:
-		loop-player's gamemode is creative:
+		if loop-player's gamemode is creative:
 			allow flight to loop-player
 		if {Tag..%loop-player%} < 1:
-			if {PuffMin.%loop-player%} < 1:
-				if {PuffSec.%loop-player%} > 0:
-					set {Puff1.%loop-player%} to "%{PuffSec.%loop-player%}%s"
-				if {PuffSec.%loop-player%} < 1:
-					set {Puff1.%loop-player%} to "&aReady!"
-			if {PuffMin.%loop-player%} < 0:
-				set {Puff1.%loop-player%} to "&aReady!"
-			if {PuffMin.%loop-player%} > 0:
-				if {PuffSec.%loop-player%} < 1:
-					set {Puff1.%loop-player%} to "%{PuffMin.%loop-player%}%m"
-				if {PuffSec.%loop-player%} > 0:
-					set {Puff1.%loop-player%} to "%{PuffMin.%loop-player%}%m %{PuffSec.%loop-player%}%s"
-			if {PuffMin2.%loop-player%} < 1:
-				if {PuffSec2.%loop-player%} > 0:
-					set {Puff2.%loop-player%} to "%{PuffSec2.%loop-player%}%s"
-				if {PuffSec2.%loop-player%} < 1:
-					set {Puff2.%loop-player%} to "&aReady!"
-			if {PuffMin2.%loop-player%} < 0:
-				set {Puff2.%loop-player%} to "&aReady!"
-			if {PuffMin2.%loop-player%} > 0:
-				if {PuffSec2.%loop-player%} < 1:
-					set {Puff2.%loop-player%} to "%{PuffMin2.%loop-player%}%m"
-				if {PuffSec2.%loop-player%} > 0:
-					set {Puff2.%loop-player%} to "%{PuffMin2.%loop-player%}%m %{PuffSec2.%loop-player%}%s"
-			if {PuffMin3.%loop-player%} < 1:
-				if {PuffSec3.%loop-player%} > 0:
-					set {Puff3.%loop-player%} to "%{PuffSec3.%loop-player%}%s"
-				if {PuffSec3.%loop-player%} < 1:
-					set {Puff3.%loop-player%} to "&aReady!"
-			if {PuffMin3.%loop-player%} < 0:
-				set {Puff3.%loop-player%} to "&aReady!"
-			if {PuffMin3.%loop-player%} > 0:
-				if {PuffSec3.%loop-player%} < 1:
-					set {Puff3.%loop-player%} to "%{PuffMin3.%loop-player%}%m"
-				if {PuffSec3.%loop-player%} > 0:
-					set {Puff3.%loop-player%} to "%{PuffMin3.%loop-player%}%m %{PuffSec3.%loop-player%}%s"
-			if loop-player's off hand item is {Bliss.Puff.T1.%loop-player%}:
-				blissPuffAutoEnchantT1(loop-player)
-				blissPuffActionBarT1(loop-player)
-			if loop-player is holding {Bliss.Puff.T1.%loop-player%}:
-				blissPuffAutoEnchantT1(loop-player)
-				blissPuffActionBarT1(loop-player)
-			if loop-player's off hand item is {Bliss.Puff.T2.%loop-player%}:
-				blissPuffAutoEnchantT2(loop-player)
-				blissPuffActionBarT2(loop-player)
-			if loop-player is holding {Bliss.Puff.T2.%loop-player%}:
-				blissPuffAutoEnchantT2(loop-player)
-				blissPuffActionBarT2(loop-player)
+			set {_puffLevels::*} to 1, 2, 3
+			loop {_puffLevels::*}:
+				set {_min} to {PuffMin%loop-value%.%loop-player%}
+				set {_sec} to {PuffSec%loop-value%.%loop-player%}
 
-#Functions
-function blissPuffAutoEnchantT2(p: player):
+				if {_min} < 1:
+					if {_sec} > 0:
+						set {Puff%loop-value%.%loop-player%} to "%{_sec}%s"
+					else:
+						set {Puff%loop-value%.%loop-player%} to "&aReady!"
+				else if {_min} > 0:
+					if {_sec} < 1:
+						set {Puff%loop-value%.%loop-player%} to "%{_min}%m"
+					else:
+						set {Puff%loop-value%.%loop-player%} to "%{_min}%m %{_sec}%s"
+
+			set {_tiers::*} to "T1", "T2" 
+			loop {_tiers::*}:
+				if loop-player's off hand item is {Bliss.Puff.%loop-value%.%loop-player%} or loop-player is holding {Bliss.Puff.%loop-value%.%loop-player%}:
+					blissPuffAutoEnchant%loop-value%(loop-player)
+					blissPuffActionBar%loop-value%(loop-player)
+
+# Functions
+function blissPuffAutoEnchant(tier: number, p: player):
 	if {puff.cooldown.%{_p}%} is false:
-		send "&f🔮 &bAuto Enchanting" to {_p}
+		send "&f🔮 &bAuto Enchanting Tier %{_tier}%" to {_p}
 		set {PuffMin.%{_p}%} to 10
 		set {PuffSec.%{_p}%} to 0
-		set {puff.cooldown.%{_p}%} to true
+		setCooldown(10, {puff.cooldown.%{_p}%})
 		loop all items in {_p}'s inventory:
 			loop-item is not enchanted with power:
 				if loop-item is a bow:
-					enchant the loop-item with power 5
-			loop-item is not enchanted with punch:
-				if loop-item is a bow:
-					enchant the loop-item with punch 2
-			loop-item is not enchanted with feather falling:
-				if loop-item is any boots:
-					enchant the loop-item with feather falling 5
-function blissPuffAutoEnchantT1(p: player):
-	if {puff.cooldown.%{_p}%} is false:
-		send "&f🔺 &bAuto Enchanting" to {_p}
-		set {PuffMin.%{_p}%} to 10
-		set {PuffSec.%{_p}%} to 0
-		set {puff.cooldown.%{_p}%} to true
-		loop all items in {_p}'s inventory:
-			loop-item is not enchanted with power:
-				if loop-item is a bow:
-					enchant the loop-item with power 3
-			loop-item is not enchanted with punch:
-				if loop-item is a bow:
-					enchant the loop-item with punch 1
-			loop-item is not enchanted with feather falling:
-				if loop-item is any boots:
-					enchant the loop-item with feather falling 2
-function blissPuffActionBarT2(p: player):
-	send action bar "&f☁ &b%{Puff3.%{_p}%}%  &f🔮 &b%{Puff1.%{_p}%}%  &f⏫ &b%{Puff2.%{_p}%}%" to {_p}
-function blissPuffActionBarT1(p: player):
-	send action bar "&f🔺 &b%{Puff1.%{_p}%}%" to {_p}
+					enchant the loop-item with power {_tier}
+					enchant the loop-item with punch {_tier}
+
+function blissPuffActionBar(tier: number, p: player):
+	if {_tier} is 1:
+		apply resistance 1 without particles whilst hiding the potion icon to {_p} for 2 seconds replacing the existing effect
+		send action bar "&f🔺 &b%{Puff1.%{_p}%}%" to {_p}
+	else if {_tier} is 2:
+		apply resistance 2 without particles whilst hiding the potion icon to {_p} for 2 seconds replacing the existing effect
+		apply absorption 1 without particles whilst hiding the potion icon to {_p} for 2 seconds replacing the existing effect
+		send action bar "&f☁ &b%{Puff3.%{_p}%}%  &f🔮 &b%{Puff1.%{_p}%}%  &f⏫ &b%{Puff2.%{_p}%}%" to {_p}
 
 every 1 second:
 	loop all players:
-		remove 1 from {PuffDJSec.%loop-player%}
-		remove 1 from {PuffSec.%loop-player%}
-		remove 1 from {PuffSec2.%loop-player%}
-		remove 1 from {PuffSec3.%loop-player%}
-		if {PuffSec.%loop-player%} is -1:
-			remove 1 from {PuffMin.%loop-player%}
-			set {PuffSec.%loop-player%} to 59
-			if {PuffMin.%loop-player%} is -1:
-				set {puff.cooldown.%loop-player%} to false
-		if {PuffSec2.%loop-player%} is -1:
-			remove 1 from {PuffMin2.%loop-player%}
-			set {PuffSec2.%loop-player%} to 59
-			if {PuffMin2.%loop-player%} is -1:
-				set {puff.cooldown2.%loop-player%} to false
-		if {PuffSec3.%loop-player%} is -1:
-			remove 1 from {PuffMin3.%loop-player%}
-			set {PuffSec3.%loop-player%} to 59
-			if {PuffMin3.%loop-player%} is -1:
-				set {puff.cooldown3.%loop-player%} to false
-		if {PuffDJSec.%loop-player%} < 0:
-			set {puffDJ.cooldown.%loop-player%} to false
+		updatePuffTimers(loop-player)
+
+function updatePuffTimers(p: Player):
+	loop 1 to 3:
+		set {_secVariable} to PuffSec%loop-number%.%p%
+		if {_secVariable} is not set:
+			continue
+		remove 1 from {_secVariable}
+		if {_secVariable} is -1:
+			remove 1 from {PuffMin%loop-number%.%p%}
+			set {_secVariable} to 59
+			if {PuffMin%loop-number%.%p%} is -1:
+				set {puff.cooldown%loop-number%.%p%} to false
+		set PuffSec%loop-number%.%p% to {_secVariable}
+
+	if {PuffDJSec.%p%} < 0:
+		set {puffDJ.cooldown.%p%} to false
+
 on jump:
-	if {Tag..%player%} < 1:
-		if {puff.jump.%player%} is true:
-			if player's off hand item is {Bliss.Puff.T1.%player%}:
-				if {puffDJ.cooldown.%player%} is not true:
-					send "&f🔺 &bYou have used Double jump now on cooldown for 5 seconds"
-					push player forward at speed 0.7
-					draw 5 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
-					push player up at speed 0.3
-					set {PuffDJSec.%player%} to 5
-					set {puffDJ.cooldown.%player%} to true
-					loop 6 times:
-						wait 1 ticks
-						draw 2 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
-						wait 1 ticks
-						draw 3 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
-			if player's off hand item is {Bliss.Puff.T2.%player%}:
-				if {puffDJ.cooldown.%player%} is not true:
-					send "&f🔮 &bYou have used Double jump now on cooldown for 5 seconds"
-					push player forward at speed 1
-					draw 5 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
-					push player up at speed 0.3
-					set {PuffDJSec.%player%} to 5
-					set {puffDJ.cooldown.%player%} to true
-					loop 6 times:
-						wait 1 ticks
-						draw 2 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
-						wait 1 ticks
-						draw 3 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
-	set {puff.jump.%player%} to true
+	if {Tag..%player%} < 1 and {puff.jump%player%} is true:
+		doubleJumpHandler(player, {Bliss.Puff.T1.%player%}, 0.7, 5)
+		doubleJumpHandler(player, {Bliss.Puff.T2.%player%}, 1, 5)
+		
+function doubleJumpHandler(p: player, puffItem: item, forwardSpeed: number, clouds: number):
+	if player's off hand item is puffItem and {puffDJ.cooldown.%p%} is not true:
+		send "&f🔮 &bYou have used Double jump now on cooldown for 5 seconds"
+		push player forward at speed forwardSpeed
+		draw clouds cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
+		push player up at speed 0.3
+		set {PuffDJSec.%p%} to 5
+		set {puffDJ.cooldown.%p%} to true
+		loop 6 times:
+			wait 1 ticks
+			draw 2 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
+			wait 1 ticks
+			draw 3 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
+	set {puff.jump.%p%} to true
 	wait 0.75 second
-	set {puff.jump.%player%} to false
+	set {puff.jump.%p%} to false
+		
 on damage:
 	if damage cause is fall:
-		if victim's held item is {Bliss.Puff.T1.%victim%}:
-			cancel event
-		if victim's off hand item is {Bliss.Puff.T1.%victim%}:
-			cancel event
-		if victim's offhand item is {Bliss.Puff.T2.%victim%}:
-			cancel event
-		if victim's held item is {Bliss.Puff.T2.%victim%}:
-			cancel event
+		set {_puffItems::*} to {Bliss.Puff.T1.%victim%}, {Bliss.Puff.T2.%victim%}
+		loop {_puffItems::*}:
+			if victim's held item is loop-value or victim's off hand item is loop-value:
+				cancel event
+				stop
 
 #Breezy Bash
+on attack:
 	if {Tag..%attacker%} < 1:
-		if attacker's held item is {Bliss.Puff.T2.%attacker%}:
-			if {puff.cooldown3.%attacker%} is true:
+		if {Tag..%attacker%} < 1 and attacker's held item is {Bliss.Puff.T2.%attacker%}:
+			if {puff.cooldown3.%attacker%}:
 				send "&f🔮 &cYour &f☁Breezy Bash &cskill is on cooldown for &f%{Puff3.%attacker%}%" to attacker
-			if {puff.cooldown3.%attacker%} is not true:
-				wait 1 tick
-				send "&f🔮 &bYou used &f☁Breezy Bash &bon %victim%" to attacker
-				send "&f🔮 &bYou have been affected by &f☁Breezy bash &bby %attacker%" to victim
-				set {PuffMin3.%attacker%} to 1
-				set {PuffSec3.%attacker%} to 35
-				set {puff.cooldown3.%attacker%} to true
-				push victim up at speed 3
-				loop 8 times:
-					set {_attacker} to location 1 metres above attacker
-					set {_victim} to location 1 metres above victim
-					set {_trail} to a line from {_victim} to {_attacker}
-					set particle of {_trail} to dust particle using dustOption(rgb(255, 255, 255), 1.5) with force
-					draw shapes {_trail} at {_victim}
-					wait 0.1 seconds
-				push victim down at velocity 5
-				loop 4 times:
-					loop 10 times:
-						set {_attacker} to location 1 metres above attacker
-						set {_victim} to location 1 metres above victim
-						set {_trail} to a line from {_victim} to {_attacker}
-						set particle of {_trail} to dust particle using dustOption(rgb(255, 255, 255), 1.5) with force
-						draw shapes {_trail} at {_victim}
-						wait 0.1 seconds
+				stop
+			wait 1 tick
+			send "&f🔮 &bYou used &f☁Breezy Bash &bon %victim%" to attacker
+			send "&f🔮 &bYou have been affected by &f☁Breezy bash &bby %attacker%" to victim
+			set {PuffMin3.%attacker%} to 1
+			set {PuffSec3.%attacker%} to 35
+			setCooldown(35, {puff.cooldown3.%attacker%})
+
+			executeBreezyEffect(attacker, victim)
+
 on left click:
-	if {Tag..%player%} < 1:
-		if player's held item is {Bliss.Puff.T2.%player%}:
-			if {puff.cooldown3.%player%} is true:
-				send "&f🔮 &cYour &f☁Breezy Bash &cskill is on cooldown for &f%{Puff3.%player%}%" to player
-			if {puff.cooldown3.%player%} is not true:
-				send "&f🔮 &bYou used &f☁Breezy Bash &bGroup" to player
-				set {PuffMin3.%player%} to 1
-				set {PuffSec3.%player%} to 35
-				set {puff.cooldown3.%player%} to true
-				set {_puff2circles.%player%::location} to player's location
-				set {_puffcircles::circle} to a circle of radius 0.75
-				set {_puffcircles::smallcircle} to a circle of radius 1
-				set {_puffcircles::smallcircle1} to a circle of radius 1.25
-				set {_puffcircles::smallcircle2} to a circle of radius 1.5
-				set {_puffcircles::smallcircle3} to a circle of radius 1.75
-				set {_puffcircles::mediumcircle} to a circle of radius 2
-				set {_puffcircles::mediumcircle1} to a circle of radius 2.25
-				set {_puffcircles::mediumcircle2} to a circle of radius 2.5
-				set {_puffcircles::mediumcircle3} to a circle of radius 2.75
-				set {_puffcircles::largecircle} to a circle of radius 3
-				set {_puffcircles::largecircle1} to a circle of radius 3.25
-				set {_puffcircles::largecircle2} to a circle of radius 3.5
-				set {_puffcircles::largecircle3} to a circle of radius 3.75
-				set {_puffcircles::finalcircle} to a circle of radius 4
-				set particle of {_puffcircles::*} to dust particle using dustOption(rgb(224, 224, 224), 1) with force
-				draw shapes {_puffcircles::circle} at {_puff2circles.%player%::location}
-				draw shapes {_puffcircles::smallcircle} at {_puff2circles.%player%::location}
-				wait 1 tick
-				draw shapes {_puffcircles::smallcircle1} at {_puff2circles.%player%::location}
-				draw shapes {_puffcircles::smallcircle2} at {_puff2circles.%player%::location}
-				wait 1 tick
-				draw shapes {_puffcircles::smallcircle3} at {_puff2circles.%player%::location}
-				draw shapes {_puffcircles::mediumcircle} at {_puff2circles.%player%::location}
-				wait 1 tick
-				draw shapes {_puffcircles::mediumcircle1} at {_puff2circles.%player%::location}
-				draw shapes {_puffcircles::mediumcircle2} at {_puff2circles.%player%::location}
-				wait 1 tick
-				draw shapes {_puffcircles::mediumcircle3} at {_puff2circles.%player%::location}
-				draw shapes {_puffcircles::largecircle} at {_puff2circles.%player%::location}
-				wait 1 tick
-				draw shapes {_puffcircles::largecircle1} at {_puff2circles.%player%::location}
-				draw shapes {_puffcircles::largecircle2} at {_puff2circles.%player%::location}
-				wait 1 tick
-				draw shapes {_puffcircles::largecircle3} at {_puff2circles.%player%::location}
-				draw shapes {_puffcircles::finalcircle} at {_puff2circles.%player%::location}
-				wait 1 tick
-				loop 3 times:
-					draw shapes {_puffcircles::finalcircle} at {_puff2circles.%player%::location}
-				loop all entities within 4 blocks of {_puff2circles.%player%::location}:
-					if {Trusted.%player%.%loop-entity%} is not true:
-						set {_direction} to vector between {_location} and {_player}
-						set {_v} to vector between player and loop-entity
-						push loop-entity up at speed 1.25
-						push loop-entity {_v} at speed 2
-				loop 3 times:
-					draw shapes {_puffcircles::finalcircle} at {_puff2circles.%player%::location}
+	if {Tag..%player%} < 1 and player's held item is {Bliss.Puff.T2.%player%}:
+		if {puff.cooldown3.%player%}:
+			send "&f🔮 &cYour &f☁Breezy Bash &cskill is on cooldown for &f%{Puff3.%player%}%" to player
+			stop
+		send "&f🔮 &bYou used &f☁Breezy Bash &bGroup" to player
+		set {PuffMin3.%player%} to 1
+		set {PuffSec3.%player%} to 35
+		setCooldown(35, {puff.cooldown3.%player%})
+
+		executePuffGroupEffect(player)
+
+# ADDED THREE FUNCTIONS TO FIX TISM BRUH
+function executePuffBreezyEffect(attacker: player, victim: player):
+	push victim up at speed 3
+	loop 8 times:
+		createPuffTrail(attacker, victim)
+		wait 0.1 seconds
+	push victim down at velocity 5
+	loop 4 times:
+		loop 10 times:
+			createPuffTrail(attacker, victim)
+			wait 0.1 seconds
+
+function executePuffGroupEffect(player: player):
+	set {_puffLocation} to player's location
+	set {_puffCircleRadius} to [0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4]
+	set particle of {_puffCircleRadius::*} to dust particle using dustOption(rgb(224, 224, 224), 1) with force
+	loop {_puffCircleRadius}:
+		draw shapes circle of radius {_puffRadius} at {_puffLocation}
+		wait 1 tick
+	loop all entities within 4 blocks of {_puffLocation}:
+		if {Trusted.%player%.%loop-entity%} is not true:
+			push loop-entity up at speed 1.25
+			push loop-entity vector between player and loop-entity at speed 2
+
+function createPuffTrail(attacker: player, victim: player):
+	set {_attacker} to location 1 metres above attacker
+	set {_victim} to location 1 metres above victim
+	set {_trail} to a line from {_victim} to {_attacker}
+	set particle of {_trail} to dust particle using dustOption(rgb(255, 255, 255), 1.5) with force
+	draw shapes {_trail} at {_victim}
+
 #Dash
-
 on right click:
-	if {Tag..%player%} < 1:
-		if player's held item is {Bliss.Puff.T2.%player%}:
-			if {puff.cooldown2.%player%} is true:
-				send "&f🔮 &cYour &f⏫Dash &cskill is on cooldown for &f%{Puff2.%player%}%" to player
-			if {puff.cooldown2.%player%} is not true:
-				send "&f🔮 &bYou have activated &f⏫Dash &bskill" to player
-				push player forward at speed 3
-				set {PuffMin2.%player%} to 0
-				set {PuffSec2.%player%} to 20
-				set {puff.cooldown2.%player%} to true
-				loop 2 times:
-					loop 12 times:
-						loop all entities within 1.5 blocks of the player:
-							if {Trusted.%player%.%loop-entity%} is not true:
-								damage loop-entity by 2 hearts
-						wait 1 ticks
-						draw 3 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
+	if {Tag..%player%} < 1 and player's held item is {Bliss.Puff.T2.%player%}:
+		if {puff.cooldown2.%player%}:
+			send "&f🔮 &cYour &f⏫Dash &cskill is on cooldown for &f%{Puff2.%player%}%" to player
+		else:
+			send "&f🔮 &bYou have activated &f⏫Dash &bskill" to player
+			push player forward at speed 3
+			set {PuffMin2.%player%} to 0
+			set {PuffSec2.%player%} to 20
+			setCooldown(20, {puff.cooldown2.%player%})
+			loop 2 times:
+				loop 12 times:
+					loop all entities within 1.5 blocks of the player:
+						if {Trusted.%player%.%loop-entity%} is not true:
+							damage loop-entity by 2 hearts
+					wait 1 ticks
+					draw 3 cloud at player with offset vector(0.1, 0.1, 0.1) with extra 0
 
-on drop prismarine shard:
-	if event-item is {Bliss.Puff.T2.%player%}:
+on drop:
+	if event-item is {Bliss.Puff.T2.%player%} or event-item is {Bliss.Puff.T1.%player%}:
 		cancel event
-on drop amethyst shard:
-	if event-item is {Bliss.Puff.T1.%player%}:
-		cancel event		
 
 
 #[<-----------------Speed----------------->]
