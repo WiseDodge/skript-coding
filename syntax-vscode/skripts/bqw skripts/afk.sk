@@ -1,6 +1,5 @@
 every 5 minutes:
-    loop all players:
-        set {_region} to "%region at loop-player%" # Store the region to avoid multiple calls
-        if {_region} contains "afk":
-            play sound "entity.experience_orb.pickup" with volume 3 to all players
-            give sunflower named "&6&lAFK Token" to loop-player
+    set {_afkPlayers} to all players where ["%region at input%" contains "afk"]
+    loop {_afkPlayers}:
+        play sound "entity.experience_orb.pickup" with volume 3 to all players
+        give sunflower named "&6&lAFK Token" to loop-player
