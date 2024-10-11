@@ -4522,118 +4522,41 @@ on drop amethyst shard:
 
 #[<-----------------Strength----------------->]
 
-
-every 5 tick:
+# refactored initial timings
+every 5 ticks:
 	loop all players:
 		if {Tag..%loop-player%} < 1:
-			if {StrengthMin.%loop-player%} < 1:
-				if {StrengthSec.%loop-player%} > 0:
-					set {Strength1.%loop-player%} to "%{StrengthSec.%loop-player%}%s"
-				if {StrengthSec.%loop-player%} < 1:
-					set {Strength1.%loop-player%} to "&aReady!"
-			if {StrengthMin.%loop-player%} < 0:
-				set {Strength1.%loop-player%} to "&aReady!"
-			if {StrengthMin.%loop-player%} > 0:
-				if {StrengthSec.%loop-player%} < 1:
-					set {Strength1.%loop-player%} to "%{StrengthMin.%loop-player%}%m"
-				if {StrengthSec.%loop-player%} > 0:
-					set {Strength1.%loop-player%} to "%{StrengthMin.%loop-player%}%m %{StrengthSec.%loop-player%}%s"
-			if {StrengthMin2.%loop-player%} < 1:
-				if {StrengthSec2.%loop-player%} > 0:
-					set {Strength2.%loop-player%} to "%{StrengthSec2.%loop-player%}%s"
-				if {StrengthSec2.%loop-player%} < 1:
-					set {Strength2.%loop-player%} to "&aReady!"
-			if {StrengthMin2.%loop-player%} < 0:
-				set {Strength2.%loop-player%} to "&aReady!"
-			if {StrengthMin2.%loop-player%} > 0:
-				if {StrengthSec2.%loop-player%} < 1:
-					set {Strength2.%loop-player%} to "%{StrengthMin2.%loop-player%}%m"
-				if {StrengthSec2.%loop-player%} > 0:
-					set {Strength2.%loop-player%} to "%{StrengthMin2.%loop-player%}%m %{StrengthSec2.%loop-player%}%s"
-			if {StrengthMin3.%loop-player%} < 1:
-				if {StrengthSec3.%loop-player%} > 0:
-					set {Strength3.%loop-player%} to "%{StrengthSec3.%loop-player%}%s"
-				if {StrengthSec3.%loop-player%} < 1:
-					set {Strength3.%loop-player%} to "&aReady!"
-			if {StrengthMin3.%loop-player%} < 0:
-				set {Strength3.%loop-player%} to "&aReady!"
-			if {StrengthMin3.%loop-player%} > 0:
-				if {StrengthSec3.%loop-player%} < 1:
-					set {Strength3.%loop-player%} to "%{StrengthMin3.%loop-player%}%m"
-				if {StrengthSec3.%loop-player%} > 0:
-					set {Strength3.%loop-player%} to "%{StrengthMin3.%loop-player%}%m %{StrengthSec3.%loop-player%}%s"
-			if loop-player's off hand item is {Bliss.Strength.T1.%loop-player%}:
+			set {_strengthLevels::*} to 1, 2, 3
+			loop {_strengthLevels::*}:
+				set {_min} to {StrengthMin%loop-value%.%loop-player%}
+				set {_sec} to {StrengthSec%loop-value%.%loop-player%}
+				
+				if {_min} < 1:
+					if {_sec} > 0:
+						set {Strength%loop-value%.%loop-player%} to "%{_sec}%s"
+					else:
+						set {Strength%loop-value%.%loop-player%} to "&aReady!"
+				else if {_min} > 0:
+					if {_sec} < 1:
+						set {Strength%loop-value%.%loop-player%} to "%{_min}%m"
+					else:
+						set {Strength%loop-value%.%loop-player%} to "%{_min}%m %{_sec}%s"
+
+			# Bliss Strength Gem in Main or Off-Hand
+			set {_tiers::*} to "T1", "T2"
+			loop {_tiers::*}:
+				if loop-player's off hand item is {Bliss.Strength.%loop-value%.%loop-player%} or loop-player is holding {Bliss.Strength.%loop-value%.%loop-player%}:
+					blissStrengthAutoEnchant(loop-value parsed as number, loop-player)
+					send action bar "&4🔺 %{Strength%loop-value%.%loop-player%}%" to loop-player
+
+				# Check if auto-enchant should trigger
 				if {strength.cooldown.%loop-player%} is false:
-					send action bar "&4🔺 &aReady!" to loop-player
-				if {strength.cooldown.%loop-player%} is true:
-					send action bar "&4🔺 &b%{Strength1.%loop-player%}%" to loop-player
-				apply strength 1 without particles whilst hiding the potion icon to loop-player for 2 seconds replacing the existing effect
-			if loop-player is holding {Bliss.Strength.T1.%loop-player%}:
-				if {strength.cooldown.%loop-player%} is false:
-					send action bar "&4🔺 &aReady!" to loop-player
-				if {strength.cooldown.%loop-player%} is true:
-					send action bar "&4🔺 &b%{Strength1.%loop-player%}%" to loop-player
-				apply strength 1 without particles whilst hiding the potion icon to loop-player for 2 seconds replacing the existing effect
-			if loop-player is holding {Bliss.Strength.T2.%loop-player%}:
-				apply strength 2 without particles whilst hiding the potion icon to loop-player for 2 seconds replacing the existing effect
-				send action bar "&4🤺 &b%{Strength2.%loop-player%}%  &4🔮 &b%{Strength1.%loop-player%}%  &4⚔ &b%{Strength3.%loop-player%}%" to loop-player
-			if loop-player's off hand item is {Bliss.Strength.T2.%loop-player%}:
-				apply strength 2 without particles whilst hiding the potion icon to loop-player for 2 seconds replacing the existing effect
-				send action bar "&4🤺 &b%{Strength2.%loop-player%}%  &4🔮 &b%{Strength1.%loop-player%}%  &4⚔ &b%{Strength3.%loop-player%}%" to loop-player
-			if loop-player's off hand item is {Bliss.Strength.T1.%loop-player%}:
-				if {strength.cooldown.%loop-player%} is false:
-					if loop-player's held item is any sword:
-						enchant the loop-player's tool with sharpness 3
-						send "&4🔺 &bAuto Enchanting" to loop-player
-					if loop-player's held item is any axe:
-						enchant the loop-player's tool with sharpness 3
-						send "&4🔺 &bAuto Enchanting" to loop-player
+					if loop-player's held item is any sword or loop-player's held item is any axe:
+						enchant the loop-player's tool with sharpness (if loop-value is "T1", 3, else 5)
+						send "&4🔺 Auto Enchanting" to loop-player
 					set {StrengthMin.%loop-player%} to 9
 					set {StrengthSec.%loop-player%} to 59
 					set {strength.cooldown.%loop-player%} to true
-			if loop-player's off hand item is {Bliss.Strength.T2.%loop-player%}:
-				if {strength.cooldown.%loop-player%} is false:
-					if loop-player's held item is any sword:
-						enchant the loop-player's tool with sharpness 5
-						send "&4🔮 &bAuto Enchanting" to loop-player
-					if loop-player's held item is any axe:
-						enchant the loop-player's tool with sharpness 5
-						send "&4🔮 &bAuto Enchanting" to loop-player
-					set {StrengthMin.%loop-player%} to 9
-					set {StrengthSec.%loop-player%} to 59
-					set {strength.cooldown.%loop-player%} to true
-			if loop-player is holding {Bliss.Strength.T1.%loop-player%}:
-				if {strength.cooldown.%loop-player%} is false:
-					send "&4🔺 &bAuto Enchanting" to loop-player
-					set {StrengthMin.%loop-player%} to 9
-					set {StrengthSec.%loop-player%} to 59
-					set {strength.cooldown.%loop-player%} to true
-			if loop-player is holding {Bliss.Strength.T2.%loop-player%}:
-				if {strength.cooldown.%loop-player%} is false:
-					send "&4🔮 &bAuto Enchanting" to loop-player
-					set {StrengthMin.%loop-player%} to 9
-					set {StrengthSec.%loop-player%} to 59
-					set {strength.cooldown.%loop-player%} to true
-every 1 second:
-	loop all players:
-		remove 1 from {StrengthSec.%loop-player%}
-		remove 1 from {StrengthSec2.%loop-player%}
-		remove 1 from {StrengthSec3.%loop-player%}
-		if {StrengthSec.%loop-player%} is -1:
-			remove 1 from {StrengthMin.%loop-player%}
-			set {StrengthSec.%loop-player%} to 59
-			if {StrengthMin.%loop-player%} is -1:
-				set {strength.cooldown.%loop-player%} to false
-		if {StrengthSec2.%loop-player%} is -1:
-			remove 1 from {StrengthMin2.%loop-player%}
-			set {StrengthSec2.%loop-player%} to 59
-			if {StrengthMin2.%loop-player%} is -1:
-				set {strength.cooldown2.%loop-player%} to false
-		if {StrengthSec3.%loop-player%} is -1:
-			remove 1 from {StrengthMin3.%loop-player%}
-			set {StrengthSec3.%loop-player%} to 59
-			if {StrengthMin3.%loop-player%} is -1:
-				set {strength.cooldown3.%loop-player%} to false
 
 #Frailer
 
