@@ -4551,11 +4551,15 @@ every 5 ticks:
 				# Check if auto-enchant should trigger
 				if {strength.cooldown.%loop-player%} is false:
 					if loop-player's held item is any sword or loop-player's held item is any axe:
-						enchant the loop-player's tool with sharpness (if loop-value is "T1", 3, else 5)
-						send "&4🔺 Auto Enchanting" to loop-player
-					set {StrengthMin.%loop-player%} to 9
-					set {StrengthSec.%loop-player%} to 59
-					set {strength.cooldown.%loop-player%} to true
+						set {_sharpness} to enchantment level of sharpness on loop-player's tool
+						# Only enchant if current sharpness is lower than the desired level
+						if {_sharpness} < (if loop-value is "T1", 3, else 5):
+							enchant the loop-player's tool with sharpness (if loop-value is "T1", 3, else 5)
+							send "&4🔺 Auto Enchanting" to loop-player
+						set {StrengthMin.%loop-player%} to 9
+						set {StrengthSec.%loop-player%} to 59
+						set {strength.cooldown.%loop-player%} to true
+					
 
 #Frailer
 
